@@ -16,6 +16,20 @@ if (!empty($_POST['Data1'])) {
     }
 }
 
+if (isset($_POST['buttonFilter'])) {
+    $_SESSION["sessionFilterStart"] = $_POST['startTime'];
+    $_SESSION["sessionFilterEnd"] = $_POST['endTime'];
+    $sessionStartDate = date("Y-m-d H:i:s", strtotime($_SESSION["sessionFilterStart"]));
+    $sessionEndDate = date("Y-m-d H:i:s", strtotime($_SESSION["sessionFilterEnd"]));
+    
+    // var_dump($_SESSION["sessionFilterStart"]);
+    // var_dump($sessionStartDate);
+}
+
+if (isset($_POST['buttonClear'])) {
+    $_SESSION["sessionFilterStart"] = "";
+    $_SESSION["sessionFilterEnd"] = "";
+}
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +46,16 @@ if (!empty($_POST['Data1'])) {
 </head>
 
 <body>
+<?php
 
+                                    // if (isset($_POST['keywordLogData'])) {
+                                    //     echo $_POST['keywordLogData'];
+                                    // } elseif (isset($_SESSION["sessionKeywordLogData"])) {
+                                    //     echo $_SESSION["sessionKeywordLogData"];
+                                    // } else {
+                                    //     echo '';
+                                    // }
+                                    ?>
 	<div class="container">
 
 		<div class="mb-4 mt-3 text-center">
@@ -41,35 +64,50 @@ if (!empty($_POST['Data1'])) {
 				<span class="text-primary fw-normal display-6">SMKN 1 WIROSARI</span>
 			</h1>
 		</div>
+        <!-- <form action="" method="post">
+            <label for="start_time">Start Time:</label>
+            <input type="datetime-local" id="start_time" name="start_time">
+            <br><br>
+            <label for="end_time">End Time:</label>
+            <input type="datetime-local" id="end_time" name="end_time" >
+            <br><br>
+            <input type="submit" value="Search">
+        </form> -->
 		<div class="card shadow">
 			<div class="card-header bg-dark text-bg-dark">
 				<h3 class="text-center">Table Log</h3>
 			</div>
 			<div class="card-body">
 
-				<!-- <div class="row mt-2">
-					<div class="col-12 col-md-6 col-lg-4">
-						<form action="?halamanBuku=1" method="post">
+				<div class="row mt-2">
+					<div class="col-12 col-lg-12">
+						<form action="" method="post">
 							<div class="input-group mb-3">
-								<input type="text" class="form-control" placeholder="Cari Buku" name="keywordBuku"
-									value="<?php
-
-                if (isset($_POST['keywordBuku'])) {
-                    echo $_POST['keywordBuku'];
-                } elseif (isset($_SESSION["sessionKeywordBuku"])) {
-                    echo $_SESSION["sessionKeywordBuku"];
-                } else {
-                    echo '';
-                }
-                ?>">
-								<button class="btn btn-outline-dark" type="submit" id="button-addon2"
-									name="buttonCariBuku">Cari</button>
+								<input type="text" onfocus="(this.type='datetime-local')" class="form-control w-25" placeholder="Waktu Mulai" name="startTime" value="<?php 
+                                    if (!empty($_SESSION['sessionFilterStart'])) {
+                                        echo $sessionStartDate;
+                                    } else {
+                                        echo "";
+                                    }
+                                ?>">
+								<input type="text" onfocus="(this.type='datetime-local')" class="form-control w-25" placeholder="Waktu Selesai" name="endTime" value="<?php 
+                                    if (!empty($_SESSION['sessionFilterStart'])) {
+                                        echo $sessionEndDate;
+                                    } else {
+                                        echo "";
+                                    }
+                                ?>">
+								
+								<button class="btn btn-outline-dark w-25" type="submit" id="button-addon1"
+									name="buttonFilter">Filter</button>
+								<button class="btn btn-outline-dark w-25" type="submit" id="button-addon2"
+									name="buttonClear">Clear</button>
 							</div>
 						</form>
 					</div>
-				</div> -->
-				<div class="table-responsive" id="tableBuku">
-					<table class="table" id="tableBuku">
+				</div>
+				<div class="table-responsive" id="tableLogData">
+					<table class="table" id="tableLogData">
 						<thead class="table-light">
 							<tr>
 								<!-- <th>No.</th> -->
@@ -82,16 +120,21 @@ if (!empty($_POST['Data1'])) {
 						</thead>
 						<tbody class="table-group-divider">
 							<?php
-
-                            $jumlahLogData = count(query("SELECT id FROM log_data"));
-                            $limitData = 15;
-                            $awalData = $jumlahLogData - $limitData;
-                            $logData = query("SELECT * FROM log_data order by waktu LIMIT $awalData, $limitData");
+                            // WHERE datetime_field BETWEEN '$start_time' AND '$end_time'
+                            if (!empty($_SESSION['sessionFilterStart'])) {
+                                $logData = query("SELECT * FROM log_data WHERE waktu BETWEEN '$sessionStartDate' AND '$sessionEndDate'");
+                            } else {
+                                $jumlahLogData = count(query("SELECT id FROM log_data"));
+                                $limitData = 15;
+                                $awalData = $jumlahLogData - $limitData;
+                                $logData = query("SELECT * FROM log_data order by waktu LIMIT $awalData, $limitData");
+                            }
+                            
                             // var_dump($jumlahLogData);
-                            // $logData = query("SELECT RFIDB, mapel.idBuku, namaBuku, COUNT(case when status = 1 then RFIDB end) stock FROM mapel LEFT JOIN buku ON buku.idBuku = mapel.idBuku GROUP BY mapel.idBuku");
+                            // $logData = query("SELECT RFIDB, mapel.idLogData, namaLogData, COUNT(case when status = 1 then RFIDB end) stock FROM mapel LEFT JOIN LogData ON LogData.idLogData = mapel.idLogData GROUP BY mapel.idLogData");
 
                             // if ((empty($logData))) {
-                            //     echo "<tr><td class='text-center' colspan='4' style='color: red; font-style: italic; font-size: 20px;'>Buku tidak ditemukan</td></tr>";
+                            //     echo "<tr><td class='text-center' colspan='4' style='color: red; font-style: italic; font-size: 20px;'>LogData tidak ditemukan</td></tr>";
                             // }
 
                             $i = 1;
@@ -131,7 +174,11 @@ if (!empty($_POST['Data1'])) {
                                 <td><?=$oneView["voltase"];?>
                                 </td>
                                 </tr>
-                            <?php $i++;endforeach;?>
+                            <?php $i++;endforeach;
+                            if ((empty($logData))) {
+                                echo "<tr><td class='text-center' colspan='5' style='color: red; font-style: italic; font-size: 20px;'>Data Tidak Ditemukan</td></tr>";
+                            }
+                            ?>
                         </tbody>
                     </table>    
 
@@ -195,164 +242,90 @@ if (!empty($_POST['Data1'])) {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-var ct1 = document.getElementById("line-chart1").getContext("2d");
-var ct2 = document.getElementById("line-chart2").getContext("2d");
-// var ct3 = document.getElementById("line-chart3").getContext("2d");
+    var ct1 = document.getElementById("line-chart1").getContext("2d");
+    var ct2 = document.getElementById("line-chart2").getContext("2d");
+    // var ct3 = document.getElementById("line-chart3").getContext("2d");
 
 
 
 
-var chart = new Chart(ct1, {
-    type: "line",
-    data: {
-        labels: <?php echo $selisih; ?>,
-        datasets: [{
-			label: "Selisih",
-			data: <?php echo $voltase; ?>,
-			backgroundColor: "rgba(255, 255, 0, 0.3)",
-			borderColor: "rgba(200, 200, 0, 1)",
-			borderWidth: 1
-		}],
-    },
-    options: {
-        scales: {
-			yAxes: [{
-				scaleLabel: {
-					display: true,
-					labelString: 'Voltase'
-				}
-			}],
-			xAxes: [{
-				scaleLabel: {
-					display: true,
-					labelString: 'Selisih Suhu'
-				}
-			}],
-        }
-    }
-});
-
-
-// console.log(<?php echo $tm; ?>);
-
-
-var chart = new Chart(ct2, {
-    type: "line",
-    data: {
-        labels: <?php echo $tm; ?>,
-        datasets: [
-			{
-            label: "Suhu Panas",
-            data: <?php echo $suhuPanas; ?>,
-            backgroundColor: "rgba(255, 0, 20, 0.2)",
-            borderColor: "rgba(255, 0, 20, 1)",
-            borderWidth: 1
-
-        },
-        {
-            label: "Suhu Dingin",
-            data: <?php echo $suhuDingin; ?>,
-            backgroundColor: "rgba(0, 240, 255, 0.5)",
-			borderColor: "rgba(51, 153, 255, 1)",
-            borderWidth: 1
-
-        },
-	]
-    },
-    options: {
-        scales: {
-			yAxes: [{
-                scaleLabel: {
-                    display: true,
-                    labelString: 'Suhu (derajat)'
-                }
+    var chart = new Chart(ct1, {
+        type: "line",
+        data: {
+            labels: <?php echo $selisih; ?>,
+            datasets: [{
+                label: "Selisih",
+                data: <?php echo $voltase; ?>,
+                backgroundColor: "rgba(255, 255, 0, 0.3)",
+                borderColor: "rgba(200, 200, 0, 1)",
+                borderWidth: 1
             }],
-            xAxes: [{
-                scaleLabel: {
-                    display: true,
-                    labelString: 'Waktu'
-                }
-            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Voltase'
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Selisih Suhu'
+                    }
+                }],
+            }
         }
-    }
-});
-
-
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    });
+    
+    
+    // console.log(<?php echo $tm; ?>);
+    
+    
+    var chart = new Chart(ct2, {
+        type: "line",
+        data: {
+            labels: <?php echo $tm; ?>,
+            datasets: [
+                {
+                label: "Suhu Panas",
+                data: <?php echo $suhuPanas; ?>,
+                backgroundColor: "rgba(255, 0, 20, 0.2)",
+                borderColor: "rgba(255, 0, 20, 1)",
+                borderWidth: 1
+
+            },
+            {
+                label: "Suhu Dingin",
+                data: <?php echo $suhuDingin; ?>,
+                backgroundColor: "rgba(0, 240, 255, 0.5)",
+                borderColor: "rgba(51, 153, 255, 1)",
+                borderWidth: 1
+
+            },
+        ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Suhu (derajat)'
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Waktu'
+                    }
+                }]
+            }
+        }
+    });
+
+
+    </script>
 	<script src="assets/js/jquery-3.6.0.min.js"></script>
 	<script src="assets/js/script-public.js"></script>
 	<script src="assets/js/bootstrap.bundle.min.js"></script>
