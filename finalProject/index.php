@@ -84,7 +84,7 @@ if (!empty($_POST['Data1'])) {
 							<?php
 
                             $jumlahLogData = count(query("SELECT id FROM log_data"));
-                            $limitData = 5;
+                            $limitData = 15;
                             $awalData = $jumlahLogData - $limitData;
                             $logData = query("SELECT * FROM log_data order by waktu LIMIT $awalData, $limitData");
                             // var_dump($jumlahLogData);
@@ -264,7 +264,7 @@ var chart = new Chart(ct2, {
 			yAxes: [{
                 scaleLabel: {
                     display: true,
-                    labelString: 'Suhu Panas'
+                    labelString: 'Suhu (derajat)'
                 }
             }],
             xAxes: [{
