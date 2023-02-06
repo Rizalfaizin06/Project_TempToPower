@@ -83,11 +83,14 @@ if (!empty($_POST['Data1'])) {
 						<tbody class="table-group-divider">
 							<?php
 
-                            $buku = query("SELECT * FROM log_data ");
+                            $jumlahLogData = count(query("SELECT id FROM log_data"));
+                            $limitData = 5;
+                            $awalData = $jumlahLogData - $limitData;
+                            $logData = query("SELECT * FROM log_data order by waktu LIMIT $awalData, $limitData");
+                            // var_dump($jumlahLogData);
+                            // $logData = query("SELECT RFIDB, mapel.idBuku, namaBuku, COUNT(case when status = 1 then RFIDB end) stock FROM mapel LEFT JOIN buku ON buku.idBuku = mapel.idBuku GROUP BY mapel.idBuku");
 
-                            // $buku = query("SELECT RFIDB, mapel.idBuku, namaBuku, COUNT(case when status = 1 then RFIDB end) stock FROM mapel LEFT JOIN buku ON buku.idBuku = mapel.idBuku GROUP BY mapel.idBuku");
-
-                            // if ((empty($buku))) {
+                            // if ((empty($logData))) {
                             //     echo "<tr><td class='text-center' colspan='4' style='color: red; font-style: italic; font-size: 20px;'>Buku tidak ditemukan</td></tr>";
                             // }
 
@@ -98,7 +101,7 @@ if (!empty($_POST['Data1'])) {
                             $suhuDingin = array();
                             $tm = array();
 
-                            foreach ($buku as $oneView):
+                            foreach ($logData as $oneView):
                                 // $label2[] = strval(number_format($oneView["suhuPanas"], 2, '. ', '')) . " v";
                                 $voltase[] = $oneView["voltase"];
                                 // $suhuPanas = $oneView["suhuPanas"];
@@ -259,99 +262,22 @@ var chart = new Chart(ct2, {
     options: {
         scales: {
 			yAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'Suhu Panas'
-        }
-      }],
-	  xAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'Waktu'
-        }
-      }]
-            // yAxes: [{
-
-                // ticks: {
-                //     beginAtZero: true
-                // }
-            // }]
-	// 		x: {
-    //     display: true,
-
-    //   },
-    //   yAxes: {
-    //     display: true,
-    //     title: {
-    //       display: true,
-    //       text: 'Value'
-    //     }
-    //   }
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Suhu Panas'
+                }
+            }],
+            xAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Waktu'
+                }
+            }]
         }
     }
 });
 
 
-
-
-// var chart = new Chart(ct3, {
-//     type: "line",
-//     data: {
-//         labels: <?php echo $tm; ?>,
-//         datasets: [
-// 			{
-//             label: "Suhu Dingin",
-//             data: <?php echo $suhuDingin; ?>,
-//             backgroundColor: "rgba(51, 153, 255, 0.2)",
-// 			borderColor: "rgba(51, 153, 255, 1)",
-//             borderWidth: 1
-
-//         },
-// 			{
-//             label: "Suhu Dingin",
-//             data: <?php echo $suhuPanas; ?>,
-//             backgroundColor: "rgba(51, 153, 255, 0.2)",
-// 			borderColor: "rgba(51, 153, 255, 1)",
-//             borderWidth: 1
-
-//         },
-
-// 	]
-//     },
-//     options: {
-//         scales: {
-// 		yAxes: [{
-// 			scaleLabel: {
-// 				display: true,
-// 				labelString: 'Suhu Dingin'
-// 			}
-// 		}],
-// 		xAxes: [{
-// 			scaleLabel: {
-// 				display: true,
-// 				labelString: 'Waktu'
-// 			}
-// 		}]
-//             // yAxes: [{
-
-//                 // ticks: {
-//                 //     beginAtZero: true
-//                 // }
-//             // }]
-// 	// 		x: {
-//     //     display: true,
-
-//     //   },
-//     //   yAxes: {
-//     //     display: true,
-//     //     title: {
-//     //       display: true,
-//     //       text: 'Value'
-//     //     }
-//     //   }
-//         }
-//     }
-// });
 </script>
 
 
